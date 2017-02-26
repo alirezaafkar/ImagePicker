@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
                 .folderMode(false) // set folder mode (false by default)
                 .folderTitle("Folder") // folder selection title
                 .imageTitle("Tap to select") // image selection title
+                .icon(com.nguyenhoanglam.imagepicker.R.drawable.ic_camera_alt_36dp)
                 .single() // single mode
                 .multi() // multi mode (default mode)
                 .limit(10) // max images can be selected (999 by default)

@@ -31,6 +31,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,11 +61,13 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
 
     public static final int MODE_SINGLE = 1;
     public static final int MODE_MULTIPLE = 2;
+    public static final int ICON = R.mipmap.ic_launcher;
 
     public static final String INTENT_EXTRA_SELECTED_IMAGES = "selectedImages";
     public static final String INTENT_EXTRA_LIMIT = "limit";
     public static final String INTENT_EXTRA_SHOW_CAMERA = "showCamera";
     public static final String INTENT_EXTRA_MODE = "mode";
+    public static final String INTENT_EXTRA_ICON = "icon";
     public static final String INTENT_EXTRA_FOLDER_MODE = "folderMode";
     public static final String INTENT_EXTRA_FOLDER_TITLE = "folderTitle";
     public static final String INTENT_EXTRA_IMAGE_TITLE = "imageTitle";
@@ -86,6 +89,8 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
     private ActionBar actionBar;
 
     private View done;
+    private TextView mTitle;
+
     private MenuItem menuDone, menuCamera;
     private final int menuDoneId = 100;
     private final int menuCameraId = 101;
@@ -124,6 +129,8 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         }
 
         done = findViewById(R.id.done);
+        mTitle = (TextView) findViewById(R.id.title);
+
         mainLayout = (RelativeLayout) findViewById(R.id.main);
         progressBar = (ProgressWheel) findViewById(R.id.progress_bar);
         emptyTextView = (TextView) findViewById(R.id.tv_empty_images);
@@ -150,6 +157,11 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         limit = intent.getIntExtra(ImagePickerActivity.INTENT_EXTRA_LIMIT, Constants.MAX_LIMIT);
         mode = intent.getIntExtra(ImagePickerActivity.INTENT_EXTRA_MODE, ImagePickerActivity.MODE_MULTIPLE);
         folderMode = intent.getBooleanExtra(ImagePickerActivity.INTENT_EXTRA_FOLDER_MODE, false);
+
+        if (intent.hasExtra(ImagePickerActivity.INTENT_EXTRA_ICON)) {
+            int icon = intent.getIntExtra(ImagePickerActivity.INTENT_EXTRA_ICON, ImagePickerActivity.ICON);
+            ((ImageView) findViewById(R.id.icon)).setImageResource(icon);
+        }
 
         if (intent.hasExtra(INTENT_EXTRA_FOLDER_TITLE)) {
             folderTitle = intent.getStringExtra(ImagePickerActivity.INTENT_EXTRA_FOLDER_TITLE);
@@ -181,6 +193,8 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         if (actionBar != null) {
             actionBar.setTitle(folderMode ? folderTitle : imageTitle);
         }
+
+        mTitle.setText(imageTitle);
 
         /** Init folder and image adapter */
         imageAdapter = new ImagePickerAdapter(this, images, selectedImages, this);

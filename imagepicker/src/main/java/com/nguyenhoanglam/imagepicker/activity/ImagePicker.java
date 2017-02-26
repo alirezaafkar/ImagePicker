@@ -7,6 +7,7 @@ package com.nguyenhoanglam.imagepicker.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.annotation.DrawableRes;
 import android.support.v4.app.Fragment;
 
 import com.nguyenhoanglam.imagepicker.R;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
  */
 public abstract class ImagePicker {
 
+    private int icon;
     private int mode;
     private int limit;
     private boolean showCamera;
@@ -66,6 +68,7 @@ public abstract class ImagePicker {
 
     public void init(Activity activity) {
         this.mode = ImagePickerActivity.MODE_MULTIPLE;
+        this.icon = ImagePickerActivity.ICON;
         this.limit = Constants.MAX_LIMIT;
         this.showCamera = true;
         this.folderTitle = activity.getString(R.string.title_folder);
@@ -82,6 +85,11 @@ public abstract class ImagePicker {
 
     public static ImagePickerWithFragment create(Fragment fragment) {
         return new ImagePickerWithFragment(fragment);
+    }
+
+    public ImagePicker icon(@DrawableRes int icon) {
+        this.icon = icon;
+        return this;
     }
 
     public ImagePicker single() {
@@ -133,6 +141,7 @@ public abstract class ImagePicker {
     public Intent getIntent(Activity activity) {
         Intent intent = new Intent(activity, ImagePickerActivity.class);
         intent.putExtra(ImagePickerActivity.INTENT_EXTRA_MODE, mode);
+        intent.putExtra(ImagePickerActivity.INTENT_EXTRA_ICON, icon);
         intent.putExtra(ImagePickerActivity.INTENT_EXTRA_LIMIT, limit);
         intent.putExtra(ImagePickerActivity.INTENT_EXTRA_SHOW_CAMERA, showCamera);
         intent.putExtra(ImagePickerActivity.INTENT_EXTRA_FOLDER_TITLE, folderTitle);
