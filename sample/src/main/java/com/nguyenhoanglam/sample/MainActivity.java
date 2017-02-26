@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     // Recomended builder
     public void start() {
         ImagePicker.create(this)
-                .folderMode(true) // set folder mode (false by default)
+                .folderMode(false) // set folder mode (false by default)
                 .folderTitle("Folder") // folder selection title
                 .imageTitle("Tap to select") // image selection title
                 .single() // single mode

@@ -26,7 +26,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -86,6 +85,7 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
 
     private ActionBar actionBar;
 
+    private View done;
     private MenuItem menuDone, menuCamera;
     private final int menuDoneId = 100;
     private final int menuCameraId = 101;
@@ -123,14 +123,22 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
             finish();
         }
 
+        done = findViewById(R.id.done);
         mainLayout = (RelativeLayout) findViewById(R.id.main);
         progressBar = (ProgressWheel) findViewById(R.id.progress_bar);
         emptyTextView = (TextView) findViewById(R.id.tv_empty_images);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onDone();
+            }
+        });
+
+        /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        actionBar = getSupportActionBar();
+        actionBar = getSupportActionBar();*/
 
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -261,23 +269,7 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         }
 
         if (id == menuDoneId) {
-            if (selectedImages != null && selectedImages.size() > 0) {
-
-                /** Scan selected images which not existed */
-                for (int i = 0; i < selectedImages.size(); i++) {
-                    Image image = selectedImages.get(i);
-                    File file = new File(image.getPath());
-                    if (!file.exists()) {
-                        selectedImages.remove(i);
-                        i--;
-                    }
-                }
-
-                Intent data = new Intent();
-                data.putParcelableArrayListExtra(ImagePickerActivity.INTENT_EXTRA_SELECTED_IMAGES, selectedImages);
-                setResult(RESULT_OK, data);
-                finish();
-            }
+            onDone();
             return true;
         }
         if (id == menuCameraId) {
@@ -286,6 +278,26 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void onDone() {
+        if (selectedImages != null && selectedImages.size() > 0) {
+
+            /** Scan selected images which not existed */
+            for (int i = 0; i < selectedImages.size(); i++) {
+                Image image = selectedImages.get(i);
+                File file = new File(image.getPath());
+                if (!file.exists()) {
+                    selectedImages.remove(i);
+                    i--;
+                }
+            }
+
+            Intent data = new Intent();
+            data.putParcelableArrayListExtra(ImagePickerActivity.INTENT_EXTRA_SELECTED_IMAGES, selectedImages);
+            setResult(RESULT_OK, data);
+            finish();
+        }
     }
 
     /**
@@ -533,6 +545,10 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         }
     }
 
+    public void captureImageWithPermission(View view) {
+        captureImageWithPermission();
+    }
+
     /**
      * Request for camera permission
      */
@@ -658,15 +674,19 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
      * If we're displaying images, show number of selected images
      */
     private void updateTitle() {
+
         if (menuDone != null && menuCamera != null) {
             if (isDisplayingFolderView()) {
                 actionBar.setTitle(folderTitle);
                 menuDone.setVisible(false);
+                done.setVisibility(View.GONE);
             } else {
                 if (selectedImages.size() == 0) {
                     actionBar.setTitle(imageTitle);
-                    if (menuDone != null)
+                    if (menuDone != null) {
                         menuDone.setVisible(false);
+                    }
+                    done.setVisibility(View.VISIBLE);
                 } else {
                     if (mode == ImagePickerActivity.MODE_MULTIPLE) {
                         if (limit == Constants.MAX_LIMIT)
@@ -674,8 +694,10 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
                         else
                             actionBar.setTitle(String.format(getString(R.string.selected_with_limit), selectedImages.size(), limit));
                     }
-                    if (menuDone != null)
+                    if (menuDone != null) {
                         menuDone.setVisible(true);
+                    }
+                    done.setVisibility(View.VISIBLE);
                 }
             }
         }
