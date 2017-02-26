@@ -674,31 +674,34 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
      * If we're displaying images, show number of selected images
      */
     private void updateTitle() {
-
-        if (menuDone != null && menuCamera != null) {
-            if (isDisplayingFolderView()) {
+        if (isDisplayingFolderView()) {
+            if (actionBar != null) {
                 actionBar.setTitle(folderTitle);
+            }
+            if (menuDone != null) {
                 menuDone.setVisible(false);
+            }
+            done.setVisibility(View.GONE);
+        } else {
+            if (selectedImages.size() == 0) {
+                if (actionBar != null) {
+                    actionBar.setTitle(imageTitle);
+                }
+                if (menuDone != null) {
+                    menuDone.setVisible(false);
+                }
                 done.setVisibility(View.GONE);
             } else {
-                if (selectedImages.size() == 0) {
-                    actionBar.setTitle(imageTitle);
-                    if (menuDone != null) {
-                        menuDone.setVisible(false);
-                    }
-                    done.setVisibility(View.VISIBLE);
-                } else {
-                    if (mode == ImagePickerActivity.MODE_MULTIPLE) {
-                        if (limit == Constants.MAX_LIMIT)
-                            actionBar.setTitle(String.format(getString(R.string.selected), selectedImages.size()));
-                        else
-                            actionBar.setTitle(String.format(getString(R.string.selected_with_limit), selectedImages.size(), limit));
-                    }
-                    if (menuDone != null) {
-                        menuDone.setVisible(true);
-                    }
-                    done.setVisibility(View.VISIBLE);
+                if (mode == ImagePickerActivity.MODE_MULTIPLE && actionBar != null) {
+                    if (limit == Constants.MAX_LIMIT)
+                        actionBar.setTitle(String.format(getString(R.string.selected), selectedImages.size()));
+                    else
+                        actionBar.setTitle(String.format(getString(R.string.selected_with_limit), selectedImages.size(), limit));
                 }
+                if (menuDone != null) {
+                    menuDone.setVisible(true);
+                }
+                done.setVisibility(View.VISIBLE);
             }
         }
     }
