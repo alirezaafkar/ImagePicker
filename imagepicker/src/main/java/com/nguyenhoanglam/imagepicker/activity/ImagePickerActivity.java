@@ -41,6 +41,7 @@ import com.nguyenhoanglam.imagepicker.adapter.FolderPickerAdapter;
 import com.nguyenhoanglam.imagepicker.adapter.ImagePickerAdapter;
 import com.nguyenhoanglam.imagepicker.helper.Constants;
 import com.nguyenhoanglam.imagepicker.helper.ImageUtils;
+import com.nguyenhoanglam.imagepicker.helper.PathUtils;
 import com.nguyenhoanglam.imagepicker.listeners.OnFolderClickListener;
 import com.nguyenhoanglam.imagepicker.listeners.OnImageClickListener;
 import com.nguyenhoanglam.imagepicker.model.Folder;
@@ -49,13 +50,14 @@ import com.nguyenhoanglam.imagepicker.view.GridSpacingItemDecoration;
 import com.nguyenhoanglam.imagepicker.view.ProgressWheel;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by hoanglam on 7/31/16.
  */
-public class ImagePickerActivity extends AppCompatActivity implements OnImageClickListener {
+public class ImagePickerActivity extends AppCompatActivity implements OnImageClickListener, View.OnClickListener {
 
     private static final String TAG = "ImagePickerActivity";
 
@@ -158,10 +160,12 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         mode = intent.getIntExtra(ImagePickerActivity.INTENT_EXTRA_MODE, ImagePickerActivity.MODE_MULTIPLE);
         folderMode = intent.getBooleanExtra(ImagePickerActivity.INTENT_EXTRA_FOLDER_MODE, false);
 
+        ImageView appIcon = (ImageView) findViewById(R.id.app_icon);
         if (intent.hasExtra(ImagePickerActivity.INTENT_EXTRA_ICON)) {
             int icon = intent.getIntExtra(ImagePickerActivity.INTENT_EXTRA_ICON, ImagePickerActivity.ICON);
-            ((ImageView) findViewById(R.id.icon)).setImageResource(icon);
+            appIcon.setImageResource(icon);
         }
+        appIcon.setOnClickListener(this);
 
         if (intent.hasExtra(INTENT_EXTRA_FOLDER_TITLE)) {
             folderTitle = intent.getStringExtra(ImagePickerActivity.INTENT_EXTRA_FOLDER_TITLE);
@@ -541,8 +545,9 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_OK) return;
         if (requestCode == Constants.REQUEST_CODE_CAPTURE) {
-            if (resultCode == RESULT_OK && currentImagePath != null) {
+            if (currentImagePath != null) {
                 Uri imageUri = Uri.parse(currentImagePath);
                 if (imageUri != null) {
                     MediaScannerConnection.scanFile(this,
@@ -555,6 +560,16 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
                                 }
                             });
                 }
+            }
+        } else if (requestCode == Constants.REQUEST_CODE_SELECT) {
+            try {
+                File image = PathUtils.getFile(ImagePickerActivity.this, data.getData());
+            if (image != null) {
+                selectedImages = new ArrayList<>();
+                selectedImages.add(new Image(0, image.getName(), image.getPath(), true));
+                onDone();
+            }} catch (URISyntaxException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -759,6 +774,16 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         if (handler != null) {
             handler.removeCallbacksAndMessages(null);
             handler = null;
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.app_icon) {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent, ""), Constants.REQUEST_CODE_SELECT);
         }
     }
 

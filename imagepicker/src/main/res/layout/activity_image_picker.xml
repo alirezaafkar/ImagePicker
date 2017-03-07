@@ -13,12 +13,13 @@
         android:layout_height="?attr/actionBarSize">
 
         <ImageView
-            android:id="@+id/icon"
+            android:id="@+id/app_icon"
             android:layout_width="?attr/actionBarSize"
             android:layout_height="?attr/actionBarSize"
             android:layout_gravity="start|center_vertical"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="7dp"
             android:scaleType="centerInside"
             android:src="@mipmap/ic_launcher"/>
