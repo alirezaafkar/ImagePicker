@@ -145,6 +145,8 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
             }
         });
 
+        findViewById(R.id.camera).setOnClickListener(this);
+
         /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         actionBar = getSupportActionBar();*/
@@ -564,18 +566,15 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         } else if (requestCode == Constants.REQUEST_CODE_SELECT) {
             try {
                 File image = PathUtils.getFile(ImagePickerActivity.this, data.getData());
-            if (image != null) {
-                selectedImages = new ArrayList<>();
-                selectedImages.add(new Image(0, image.getName(), image.getPath(), true));
-                onDone();
-            }} catch (URISyntaxException e) {
+                if (image != null) {
+                    selectedImages = new ArrayList<>();
+                    selectedImages.add(new Image(0, image.getName(), image.getPath(), true));
+                    onDone();
+                }
+            } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
         }
-    }
-
-    public void captureImageWithPermission(View view) {
-        captureImageWithPermission();
     }
 
     /**
@@ -780,11 +779,17 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.app_icon) {
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            startActivityForResult(Intent.createChooser(intent, ""), Constants.REQUEST_CODE_SELECT);
+            launchImagePicker();
+        } else if (view.getId() == R.id.camera) {
+            captureImageWithPermission();
         }
+    }
+
+    private void launchImagePicker() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, ""), Constants.REQUEST_CODE_SELECT);
     }
 
     /**
